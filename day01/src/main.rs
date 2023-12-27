@@ -1,3 +1,4 @@
+// use std::collections::HashMap;
 use std::fs;
 
 fn main() {
@@ -22,7 +23,7 @@ fn main() {
     //     "1rdtwofjvdllht5eightsixfourbl",
     // ];
 
-    let from_digits = calibration_to_digit(input.clone());
+    let from_digits = calibration_to_digit(input);
     //  println!("{:#?}", from_digits);
     let sum = calibration(from_digits);
     println!("sum: {}", sum)
@@ -32,7 +33,7 @@ fn calibration(input: Vec<String>) -> u32 {
 
     for item in input {
         let c: std::str::Chars<'_> = item.chars();
-        let digits: Vec<char> = c.clone().filter(|c| c.is_digit(10)).collect();
+        let digits: Vec<char> = c.filter(|c| c.is_digit(10)).collect();
 
         let (x, y) = (digits[0], digits[digits.len() - 1]);
 
@@ -53,6 +54,12 @@ fn calibration_to_digit(input: Vec<&str>) -> Vec<String> {
         "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
     ];
     let mut words: Vec<String> = Vec::new();
+
+    // HACK: K = key, V = value. 
+    // transforma dois vec's num hashmap (objeto js)
+
+    // let lookup: HashMap<&&str, &&str> = spelled.iter().zip(digits.iter()).collect();
+    // println!("{:?}", lookup.get(&"two").unwrap());
 
     for (i, _) in input.iter().enumerate() {
         let mut index = 0;
