@@ -12,15 +12,66 @@ fn main() {
     let lines: Vec<&str> = input.split("\n").collect();
     let games = &lines[..lines.len() - 1];
 
-    let games_filtered = games.iter().map(|l| sum_cubes(l)).collect::<Vec<Game>>();
-    let valid_games = possible_games(games_filtered);
+    // let games_filtered = games.iter().map(|l| sum_cubes(l)).collect::<Vec<Game>>();
+    let highest_sets = games.iter().map(|l| get_fewest_set(l)).collect::<Vec<u32>>();
+    println!("{}", highest_sets.iter().sum::<u32>())
+    // let valid_games = possible_games(games_filtered);
 
-    let sum: u32 = valid_games.iter().sum();
-    println!("{}", sum)
+    // let sum: u32 = valid_games.iter().sum();
+    // println!("{:?}", highest_sets);
+}
+
+fn get_fewest_set(game: &str) -> u32 {
+    let colors = vec![
+        COLOR_1.to_string(),
+        COLOR_2.to_string(),
+        COLOR_3.to_string(),
+    ];
+
+    let full_game: Vec<&str> = game.split(":").collect();
+
+    let game_colors_filtered = full_game[1]
+        .replace(" ", "")
+        .replace(",", " ")
+        .replace(";", " ");
+
+    let game_colors = game_colors_filtered
+        .split_ascii_whitespace()
+        .collect::<Vec<&str>>();
+
+    let mut game_result: HashMap<String, u32> = colors
+        .iter()
+        .cloned()
+        .zip([0_u32, 0_u32, 0_u32].iter().cloned())
+        .collect::<HashMap<String, u32>>();
+
+    for c in game_colors.iter() {
+        let (value, string) = split_number_and_string(c.to_string());
+
+        let last_color_value = game_result.get(&string).unwrap();
+
+        if value > *last_color_value {
+            game_result.insert(string, value);
+        }
+    }
+
+    println!("{:?}", game_result);
+
+    let (r, g, b): (&u32, &u32, &u32) = (
+        game_result.get(COLOR_1).unwrap(),
+        game_result.get(COLOR_2).unwrap(),
+        game_result.get(COLOR_3).unwrap(),
+    );
+
+    r * g * b
 }
 
 fn sum_cubes(game: &str) -> Game {
-    let colors = vec![COLOR_1.to_string(), COLOR_2.to_string(), COLOR_3.to_string()];
+    let colors = vec![
+        COLOR_1.to_string(),
+        COLOR_2.to_string(),
+        COLOR_3.to_string(),
+    ];
     let full_game: Vec<&str> = game.split(":").collect();
     let game_num: u32 = full_game[0].split(" ").collect::<Vec<_>>()[1]
         .parse::<u32>()
@@ -44,7 +95,7 @@ fn sum_cubes(game: &str) -> Game {
 
         while i < game_colors.len() {
             max_value = if value > max_value { value } else { max_value };
-            break 
+            break;
         }
 
         game_result.insert(color.to_string(), max_value);
@@ -61,10 +112,14 @@ fn possible_games(games: Vec<Game>) -> Vec<u32> {
         let g_green = g.get_key_value(COLOR_2).unwrap().1;
         let g_blue = g.get_key_value(COLOR_3).unwrap().1;
 
+        println!("{:?}", g);
+
         if g_green <= &13 && g_red <= &12 && g_blue <= &14 {
             valid_games.push(n);
         }
     }
+
+    println!("{:?}", valid_games);
 
     valid_games
 }
